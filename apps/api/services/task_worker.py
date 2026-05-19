@@ -4,14 +4,14 @@ import json
 from datetime import timedelta, datetime
 from sqlalchemy.orm import Session
 from sqlalchemy import select
-from db.models import Task, TaskStatus, DeadLetterTask
-from db.database import SessionLocal
-from core.logger import get_logger
-from .ai_validator import validate_ai_response
+from apps.api.db.models import Task, TaskStatus, DeadLetterTask
+from apps.api.db.database import SessionLocal
+from apps.api.core.logger import get_logger
+from apps.api.services.ai_validator import validate_ai_response
 # [REMOVED] from .ai_service import analyze_logs_agent, validate_analysis_agent, generate_recommendation_agent
 # OpenAI dependency bypassed — mock mode active (re-enable when quota is restored)
-from .ai_evaluator import evaluate_ai_response
-from core.metrics import (
+# [REMOVED] from .ai_evaluator import evaluate_ai_response
+from apps.api.core.metrics import (
     tasks_processed,
     task_failures,
     task_duration,
