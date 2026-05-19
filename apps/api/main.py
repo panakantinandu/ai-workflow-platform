@@ -26,7 +26,20 @@ from prometheus_client import (
     generate_latest,
     multiprocess
 )
-app = FastAPI()
+from contextlib import asynccontextmanager
+import threading
+from apps.api.services.task_worker import run_worker
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Start the worker loop in a background daemon thread
+    worker_thread = threading.Thread(target=run_worker, daemon=True)
+    worker_thread.start()
+    logger.info("Background task worker started.")
+    yield
+    # The daemon thread will be killed automatically when the server stops.
+
+app = FastAPI(lifespan=lifespan)
 
 app.include_router(incident_router)
 app.include_router(workflow_router)
