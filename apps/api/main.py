@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from fastapi import Depends, Request, APIRouter
 from apps.api.db.deps import get_db
-from apps.api.db.models import Task
+from apps.api.db.models import Task, Worker
 from apps.api.routes.incidents import router as incident_router
 from apps.api.routes.workflows import router as workflow_router
 from apps.api.routes.task import router as task_router
