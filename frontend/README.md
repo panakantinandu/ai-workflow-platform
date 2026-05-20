@@ -1,70 +1,193 @@
-# Getting Started with Create React App
+# 🚀 AI Workflow Automation Platform
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A production-ready AI-powered workflow system that processes incidents, analyzes logs, generates recommendations, and provides observability through metrics and dashboards.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## 🔥 Live Demo
 
-### `npm start`
+* 🌐 Frontend: https://your-vercel-url.vercel.app
+* ⚙️ Backend API: https://ai-workflow-platform.onrender.com
+* 📊 API Docs: https://ai-workflow-platform.onrender.com/docs
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 🧠 What This Project Does
 
-### `npm test`
+This system simulates a real-world **AI incident response pipeline**:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+1. Incident is created
+2. Workflow is triggered
+3. Tasks are queued
+4. Background worker processes tasks
+5. AI analyzes logs
+6. System generates recommendations
+7. Results + metrics are stored and visualized
 
-### `npm run build`
+---
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 🏗️ Architecture
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```
+Frontend (React - Vercel)
+        ↓
+FastAPI Backend (Render)
+        ↓
+PostgreSQL (Render)
+        ↓
+Background Worker (Thread inside FastAPI)
+        ↓
+AI + Evaluation + Metrics
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+---
 
-### `npm run eject`
+## ⚙️ Tech Stack
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Backend
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+* FastAPI
+* SQLAlchemy
+* PostgreSQL
+* Background worker (thread-based queue system)
+* Prometheus metrics
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Frontend
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+* React (Create React App)
+* Axios
 
-## Learn More
+### DevOps / Deployment
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+* Render (API + DB)
+* Vercel (Frontend)
+* GitHub (CI/CD)
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+---
 
-### Code Splitting
+## 📊 Key Features
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+* ✅ Asynchronous task processing
+* 🔁 Retry + backoff mechanism
+* 🚫 Dead Letter Queue (DLQ) handling
+* 🧠 AI log analysis + evaluation scoring
+* 📈 Metrics (latency, retries, failures, DLQ)
+* 📡 Observability-ready (Prometheus compatible)
+* 🌐 Full-stack deployment
 
-### Analyzing the Bundle Size
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## 🧪 API Endpoints (Core)
 
-### Making a Progressive Web App
+| Method | Endpoint                            | Description        |
+| ------ | ----------------------------------- | ------------------ |
+| POST   | `/incidents`                        | Create incident    |
+| POST   | `/workflows/{id}/run/{incident_id}` | Trigger workflow   |
+| GET    | `/tasks`                            | Fetch recent tasks |
+| GET    | `/tasks/{id}`                       | Task details       |
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+---
 
-### Advanced Configuration
+## 🖥️ Frontend Features
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+* Task dashboard
+* Status tracking (Completed / Failed / Queued)
+* AI evaluation score display
+* Real-time refresh
+* Detailed task inspection
 
-### Deployment
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## 🚀 Local Setup
 
-### `npm run build` fails to minify
+### 1. Clone repo
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```bash
+git clone https://github.com/your-username/ai-workflow-platform.git
+cd ai-workflow-platform
+```
+
+---
+
+### 2. Backend setup
+
+```bash
+pip install -r requirements.txt
+uvicorn apps.api.main:app --reload
+```
+
+---
+
+### 3. Frontend setup
+
+```bash
+cd frontend
+npm install
+npm start
+```
+
+---
+
+## 🌍 Deployment
+
+### Backend (Render)
+
+* Web Service (FastAPI + Worker thread)
+* PostgreSQL (Free tier)
+
+### Frontend (Vercel)
+
+* Connected to backend via environment variable
+
+```env
+REACT_APP_API_URL=https://ai-workflow-platform.onrender.com
+```
+
+---
+
+## 📈 Observability
+
+* Task success/failure tracking
+* Retry metrics
+* DLQ monitoring
+* Latency histograms
+
+---
+
+## 💡 Design Decisions
+
+* Worker merged into FastAPI to support **free deployment**
+* Retry logic with exponential backoff
+* Strict task state transitions using enums
+* Fault-tolerant pipeline (DLQ for failures)
+
+---
+
+## 🚧 Future Improvements
+
+* WebSocket real-time updates
+* Authentication + multi-user support
+* Advanced AI evaluation (LLM scoring)
+* Grafana dashboard integration
+* Distributed worker system (Celery / Kafka)
+
+---
+
+## 💣 Challenges Solved
+
+* Handling async workflows without Celery
+* Building retry + DLQ system from scratch
+* Observability with Prometheus metrics
+* Deploying worker system on free tier
+
+---
+
+## 📌 Author
+
+Built by [Your Name]
+
+---
+
+## ⭐ If you like this project
+
+Give it a star ⭐ — it helps!
