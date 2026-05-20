@@ -19,6 +19,8 @@ from apps.api.schemas.task import PaginatedTaskResponse
 from fastapi import Request
 from fastapi.responses import JSONResponse
 import logging
+from apps.api.db.base import Base
+from apps.api.db.database import engine
 
 from fastapi.responses import Response
 from prometheus_client import (
@@ -88,3 +90,19 @@ def get_all_tasks(
 @app.get("/workers")
 def get_all_workers(db: Session = Depends(get_db)):
     return db.query(Worker).order_by(Worker.id.desc()).limit(20).all()
+
+@app.on_event("startup")
+def startup_event():
+    # ✅ CREATE TABLES
+    Base.metadata.create_all(bind=engine)
+
+    # 🚀 start worker
+    import threading
+    from apps.api.services.task_worker import run_worker
+
+    def start_worker():
+        print("🚀 Worker started")
+        run_worker()
+
+    thread = threading.Thread(target=start_worker, daemon=True)
+    thread.start()
