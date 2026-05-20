@@ -32,7 +32,7 @@ from apps.api.services.task_worker import run_worker
 
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI
 
 app.include_router(incident_router)
 app.include_router(workflow_router)
@@ -84,13 +84,13 @@ def get_all_workers(db: Session = Depends(get_db)):
 
 @app.on_event("startup")
 def startup_event():
-    # ✅ CREATE TABLES
+    #  CREATE TABLES
     Base.metadata.create_all(bind=engine)
 
-    # 🚀 start worker
+    #  start worker
     import threading
     def start_worker():
-        print("🚀 Worker started")
+        print(" Worker started")
         run_worker()
 
     thread = threading.Thread(target=start_worker, daemon=True)
