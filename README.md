@@ -1,12 +1,12 @@
 # 🚀 AI Workflow Automation Platform
 
-A production-ready AI-powered workflow system that processes incidents, analyzes logs, generates recommendations, and provides observability through metrics and dashboards.
+A production-ready AI-powered workflow system that processes incidents, analyzes logs, generates intelligent recommendations, and self-evaluates output quality.
 
 ---
 
 ## 🔥 Live Demo
 
-* 🌐 Frontend: https://your-vercel-url.vercel.app
+* 🌐 Frontend: https://ai-workflow-platform-sigma.vercel.app/
 * ⚙️ Backend API: https://ai-workflow-platform.onrender.com
 * 📊 API Docs: https://ai-workflow-platform.onrender.com/docs
 
@@ -14,14 +14,28 @@ A production-ready AI-powered workflow system that processes incidents, analyzes
 
 ## 🧠 Overview
 
-This system simulates a real-world **AI incident response pipeline**:
+This system simulates a real-world **AI-driven incident response pipeline**:
 
 * Incident ingestion
-* Workflow execution
-* Asynchronous task processing
-* AI-powered log analysis
-* Recommendation generation
+* Workflow orchestration
+* Asynchronous task execution
+* AI-based log analysis
+* Context-aware recommendation generation
+* AI evaluation & quality scoring
 * Observability via metrics
+
+---
+
+## ⚡ Try It (Demo Flow)
+
+1. Open the frontend
+2. Click **"Run Demo Workflow"**
+3. System will:
+
+   * Create an incident
+   * Trigger workflow
+   * Process tasks asynchronously
+4. Watch tasks update in real-time
 
 ---
 
@@ -29,21 +43,71 @@ This system simulates a real-world **AI incident response pipeline**:
 
 ```mermaid
 graph TD
-    User([User / Browser])
-    Frontend[React Dashboard]
-    API[FastAPI Service]
-    Worker[Background Worker Thread]
-    DB[(PostgreSQL Database)]
-    AI[(AI Service)]
-    Metrics[(Prometheus Metrics)]
-
     User --> Frontend
-    Frontend -->|REST API| API
+    Frontend --> API
     API --> DB
     API --> Worker
     Worker --> DB
     Worker --> AI
+    Worker --> Evaluator
     API --> Metrics
+```
+
+---
+
+## 🔄 Execution Flow
+
+```mermaid
+graph TD
+    A[Create Incident] --> B[Store in DB]
+    B --> C[Trigger Workflow]
+    C --> D[Create Tasks]
+    D --> E[Worker Picks Task]
+    E --> F[AI Analysis]
+    F --> G[AI Evaluation]
+    G --> H[Accept or Reject Output]
+    H --> I[Store Result]
+    I --> J[Frontend Fetches Data]
+```
+
+---
+
+## 🧠 AI Pipeline (CORE DIFFERENTIATOR)
+
+### 1. Log Analysis
+
+* Extracts root cause
+* Determines severity
+* Generates recommendation
+
+### 2. AI Evaluation Layer
+
+* Scores output (0–100)
+* Detects:
+
+  * generic responses
+  * incorrect reasoning
+  * low-quality recommendations
+* Rejects poor outputs automatically
+
+---
+
+## 📊 Example Output
+
+```json
+{
+  "analysis": {
+    "root_cause": "Database connection pool exhausted",
+    "severity": "high",
+    "recommendation": "Increase pool size and add retry logic"
+  },
+  "evaluation": {
+    "score": 82,
+    "confidence": "high",
+    "issues": [],
+    "reasoning": "Output matches logs and provides actionable steps"
+  }
+}
 ```
 
 ---
@@ -56,33 +120,22 @@ graph TD
 * SQLAlchemy ORM
 * PostgreSQL
 * Background Worker (thread-based)
-* Prometheus (metrics)
+* Prometheus metrics
 
 ### Frontend
 
 * React (Create React App)
 * Axios
 
+### AI Layer
+
+* LLM-based log analysis
+* AI evaluation scoring system
+
 ### Deployment
 
 * Render (Backend + DB)
 * Vercel (Frontend)
-* GitHub (CI/CD)
-
----
-
-## 🔄 Execution Flow
-
-```mermaid
-graph TD
-    A[Create Incident] --> B[Store in DB]
-    B --> C[Trigger Workflow]
-    C --> D[Create Tasks]
-    D --> E[Worker Picks Task]
-    E --> F[AI Processing]
-    F --> G[Store Result]
-    G --> H[Frontend Fetches Data]
-```
 
 ---
 
@@ -90,11 +143,12 @@ graph TD
 
 * ✅ Asynchronous task processing
 * 🔁 Retry with exponential backoff
-* 🚫 Dead Letter Queue (DLQ) handling
-* 🧠 AI-based log analysis
-* 📈 Evaluation scoring system
-* 📊 Metrics (latency, retries, failures)
-* 🌐 Fully deployed full-stack system
+* 🚫 Dead Letter Queue (DLQ)
+* 🧠 AI-powered log analysis
+* 🧪 AI output evaluation system
+* 📈 Metrics (latency, retries, failures)
+* 🎯 One-click demo workflow
+* 🌐 Fully deployed system
 
 ---
 
@@ -104,56 +158,36 @@ graph TD
 | ------ | ----------------------------------- | ---------------- |
 | POST   | `/incidents`                        | Create incident  |
 | POST   | `/workflows/{id}/run/{incident_id}` | Trigger workflow |
-| GET    | `/tasks`                            | Get recent tasks |
+| GET    | `/tasks`                            | Get tasks        |
 | GET    | `/tasks/{id}`                       | Task details     |
-
----
-
-## 🖥️ Frontend Features
-
-* Task monitoring dashboard
-* Status tracking (Completed / Failed / Queued)
-* Evaluation score display
-* Auto-refresh system
-* Detailed task view
 
 ---
 
 ## 🌍 Deployment Architecture
 
 ```mermaid
-graph LR
-    Vercel[Frontend - Vercel]
-    RenderAPI[FastAPI - Render]
-    RenderDB[(PostgreSQL - Render)]
-
-    Vercel --> RenderAPI
-    RenderAPI --> RenderDB
+graph TD
+    Frontend[Vercel] --> Backend[Render API]
+    Backend --> DB[(PostgreSQL)]
 ```
 
 ---
 
 ## 🚀 Local Setup
 
-### 1. Clone repository
-
 ```bash
 git clone https://github.com/your-username/ai-workflow-platform.git
 cd ai-workflow-platform
 ```
 
----
-
-### 2. Backend setup
+### Backend
 
 ```bash
 pip install -r requirements.txt
 uvicorn apps.api.main:app --reload
 ```
 
----
-
-### 3. Frontend setup
+### Frontend
 
 ```bash
 cd frontend
@@ -169,10 +203,8 @@ npm start
 
 ```env
 DATABASE_URL=your_database_url
-OPENAI_API_KEY=your_key (optional)
+OPENAI_API_KEY=your_key
 ```
-
----
 
 ### Frontend
 
@@ -193,29 +225,28 @@ REACT_APP_API_URL=https://ai-workflow-platform.onrender.com
 
 ## 💡 Design Decisions
 
-* Worker merged into FastAPI (free deployment constraint)
-* Retry + DLQ system for fault tolerance
-* Enum-based state management
-* Decoupled frontend and backend
+* Worker embedded inside FastAPI (free-tier constraint)
+* AI evaluation layer for quality control
+* Fault-tolerant pipeline (retry + DLQ)
+* Decoupled frontend/backend
 
 ---
 
 ## 🚧 Future Improvements
 
-* WebSocket real-time updates
+* Real-time updates (WebSockets)
 * Distributed workers (Celery/Kafka)
-* Authentication system
-* Advanced AI evaluation
-* Grafana dashboards
+* Advanced evaluation (multi-model scoring)
+* Authentication & multi-user support
 
 ---
 
 ## 💣 Challenges Solved
 
-* Async workflows without Celery
-* Retry + DLQ system design
-* Observability integration
-* Free-tier deployment constraints
+* Async workflow without Celery
+* AI hallucination control via evaluation
+* Reliable retry + DLQ system
+* Full deployment under free-tier constraints
 
 ---
 
