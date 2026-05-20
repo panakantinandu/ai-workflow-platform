@@ -74,31 +74,14 @@ graph TD
 ## 🔄 Execution Flow
 
 ```mermaid
-sequenceDiagram
-    participant User
-    participant Frontend
-    participant API
-    participant Worker
-    participant DB
-    participant AI
-
-    User->>Frontend: Create Incident
-    Frontend->>API: POST /incidents
-    API->>DB: Store incident
-
-    User->>Frontend: Run Workflow
-    Frontend->>API: Trigger workflow
-    API->>DB: Create tasks (QUEUED)
-
-    loop Background Processing
-        Worker->>DB: Fetch QUEUED tasks
-        Worker->>AI: Analyze logs
-        Worker->>DB: Update result + status
-    end
-
-    Frontend->>API: GET /tasks
-    API->>DB: Fetch tasks
-    API->>Frontend: Return results
+graph TD
+    A[Create Incident] --> B[Store in DB]
+    B --> C[Trigger Workflow]
+    C --> D[Create Tasks]
+    D --> E[Worker Picks Task]
+    E --> F[AI Processing]
+    F --> G[Store Result]
+    G --> H[Frontend Fetches Data]
 ```
 
 ---
