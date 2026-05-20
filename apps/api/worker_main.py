@@ -8,7 +8,12 @@ os.environ.setdefault("PROMETHEUS_MULTIPROC_DIR", str(_prom_dir.resolve()))
 
 import signal
 import sys
-from services.task_worker import run_worker
+import os
+
+# Add root directory to path so 'apps' can be resolved
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+from apps.api.services.task_worker import run_worker
 
 def handle_shutdown(signum, frame):
     print(f"\n⚡ Worker received signal {signum} — shutting down gracefully.")

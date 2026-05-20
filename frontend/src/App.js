@@ -56,6 +56,33 @@ export default function App() {
   const [refreshing, setRefreshing] = useState(false);
   const [lastAt,     setLastAt]     = useState(null);
   const [page,       setPage]       = useState(0);
+  const [runningDemo, setRunningDemo] = useState(false);
+  const [showDemoModal, setShowDemoModal] = useState(false);
+  const [demoData, setDemoData] = useState({
+    workflow_id: "1",
+    title: "Database Connection Timeout",
+    severity: "high",
+    source: "Datadog",
+    logs: '{"error": "timeout", "service": "db-main", "latency_ms": 5003}'
+  });
+
+  const submitDemoWorkflow = async (e) => {
+    if (e) e.preventDefault();
+    setRunningDemo(true);
+    try {
+      const { workflow_id, ...incidentPayload } = demoData;
+      const incRes = await axios.post(`${API_URL}/incidents`, incidentPayload);
+      const incidentId = incRes.data.id;
+      await axios.post(`${API_URL}/workflows/${workflow_id}/run/${incidentId}`);
+      toast.success('Workflow execution triggered successfully');
+      setShowDemoModal(false);
+      fetchTasks();
+    } catch (err) {
+      toast.error(`Failed to run demo: ${err.message}`);
+    } finally {
+      setRunningDemo(false);
+    }
+  };
 
   const fetchTasks = useCallback((silent = false) => {
     if (!silent) setRefreshing(true);
@@ -138,7 +165,15 @@ export default function App() {
           <span className="hdr-sep" />
           <span className="hdr-sub">Task Monitor</span>
         </div>
-        <div className="hdr-right">
+        <div className="hdr-right" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <button 
+            onClick={() => setShowDemoModal(true)} 
+            disabled={runningDemo}
+            className="retry-btn"
+            style={{ margin: 0, padding: '6px 12px', background: 'linear-gradient(to right, #4f46e5, #7c3aed)', border: 'none' }}
+          >
+            {runningDemo ? 'Initializing...' : '⚡ Trigger Workflow'}
+          </button>
           <div className={`live-badge ${refreshing ? 'live-spin' : ''}`}>
             <PulseDot />
             <span>Live</span>
@@ -248,6 +283,79 @@ export default function App() {
         <AnimatePresence>
           {selected && (
             <TaskDetail task={selected} onClose={() => setSelected(null)} />
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {showDemoModal && (
+            <div className="demo-modal-backdrop" style={{
+              position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+              backgroundColor: 'rgba(15, 23, 42, 0.75)', zIndex: 1000,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              backdropFilter: 'blur(4px)'
+            }}>
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
+                style={{
+                  background: '#1e293b', padding: '24px', borderRadius: '12px',
+                  width: '400px', border: '1px solid #334155', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.5)'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <h3 style={{ margin: 0, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ color: '#8b5cf6' }}>⚡</span> Manual Workflow Trigger
+                  </h3>
+                  <button onClick={() => setShowDemoModal(false)} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '18px' }}>&times;</button>
+                </div>
+                <p style={{ fontSize: '13px', color: '#94a3b8', marginBottom: '20px', lineHeight: '1.4' }}>
+                  Simulate an incoming incident payload to instantiate an AI-driven resolution workflow.
+                </p>
+                <form onSubmit={submitDemoWorkflow} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: '500', color: '#cbd5e1', marginBottom: '6px' }}>Target Workflow</label>
+                    <select value={demoData.workflow_id} onChange={e => setDemoData({...demoData, workflow_id: e.target.value})}
+                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #334155', background: '#0f172a', color: '#f8fafc', boxSizing: 'border-box', outline: 'none' }}>
+                      <option value="1">1 — Triage & Root Cause Analysis</option>
+                      <option value="2">2 — Automated Security Audit</option>
+                      <option value="3">3 — Performance Diagnostics</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: '500', color: '#cbd5e1', marginBottom: '6px' }}>Incident Title</label>
+                    <input value={demoData.title} onChange={e => setDemoData({...demoData, title: e.target.value})} required
+                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #334155', background: '#0f172a', color: '#f8fafc', boxSizing: 'border-box', outline: 'none' }} />
+                  </div>
+                  <div style={{ display: 'flex', gap: '14px' }}>
+                    <div style={{ flex: 1 }}>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: '500', color: '#cbd5e1', marginBottom: '6px' }}>Severity</label>
+                      <select value={demoData.severity} onChange={e => setDemoData({...demoData, severity: e.target.value})}
+                        style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #334155', background: '#0f172a', color: '#f8fafc', boxSizing: 'border-box', outline: 'none' }}>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="critical">Critical</option>
+                      </select>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: '500', color: '#cbd5e1', marginBottom: '6px' }}>Source System</label>
+                      <input value={demoData.source} onChange={e => setDemoData({...demoData, source: e.target.value})} required
+                        style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #334155', background: '#0f172a', color: '#f8fafc', boxSizing: 'border-box', outline: 'none' }} />
+                    </div>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: '500', color: '#cbd5e1', marginBottom: '6px' }}>Payload / Log Data</label>
+                    <textarea value={demoData.logs} onChange={e => setDemoData({...demoData, logs: e.target.value})} required
+                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #334155', background: '#050505', color: '#10b981', minHeight: '100px', boxSizing: 'border-box', resize: 'vertical', outline: 'none', fontFamily: 'monospace', fontSize: '12px' }} />
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '16px' }}>
+                    <button type="button" onClick={() => setShowDemoModal(false)} className="retry-btn" style={{ background: 'transparent', border: '1px solid #475569', color: '#cbd5e1', margin: 0, padding: '8px 16px' }}>Cancel</button>
+                    <button type="submit" disabled={runningDemo} className="retry-btn" style={{ margin: 0, padding: '8px 20px', background: '#8b5cf6', border: 'none', fontWeight: '600' }}>
+                      {runningDemo ? 'Executing...' : 'Execute Workflow'}
+                    </button>
+                  </div>
+                </form>
+              </motion.div>
+            </div>
           )}
         </AnimatePresence>
       </main>

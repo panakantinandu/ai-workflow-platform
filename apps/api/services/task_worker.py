@@ -7,10 +7,8 @@ from sqlalchemy import select
 from apps.api.db.models import Task, TaskStatus, DeadLetterTask
 from apps.api.db.database import SessionLocal
 from apps.api.core.logger import get_logger
-from apps.api.services.ai_validator import validate_ai_response
-# [REMOVED] from .ai_service import analyze_logs_agent, validate_analysis_agent, generate_recommendation_agent
-# OpenAI dependency bypassed — mock mode active (re-enable when quota is restored)
-# [REMOVED] from .ai_evaluator import evaluate_ai_response
+from .ai_validator import validate_ai_response
+from .ai_service import analyze_logs_with_ai
 from apps.api.core.metrics import (
     tasks_processed,
     task_failures,
@@ -118,36 +116,25 @@ def execute_task(task: Task, db: Session):
     try:
         if task.task_type == "analyze_logs":
             data = json.loads(task.payload)
-            logs = data.get("logs", "")
+            logs = str(data.get("logs", data.get("incident", {}).get("logs", "")))
+            
+            ai_response = analyze_logs_with_ai(logs)
+            
             analysis = {
-                "root_cause": "Database timeout",
-                "severity": "high"
+                "root_cause": ai_response.get("root_cause", "Unknown"),
+                "severity": ai_response.get("severity", "medium")
             }
+            recommendation = ai_response.get("recommendation", "No recommendation provided")
             
-            # [MOCK] validate_analysis_agent replaced — always passes in mock mode
-            validation = {"valid": True, "reason": "mock validation — OpenAI bypassed"}
-            
-            # next step - evaluation
-            evaluation = {
-                "score": 75,
-                "confidence": "high",
-                "issues": []
-            }
+            from services.ai_evaluator import evaluate_ai_response
+            evaluation = evaluate_ai_response(analysis, logs)
             score = evaluation.get("score", 0)
 
-            # metrics
             ai_evaluation_score.labels(type=task.task_type).observe(score)
 
-            # reject low quality responses
             if score < 60:
                 ai_low_quality.inc()
                 raise Exception(f"Low quality AI output: score={score}")
-
-            # [MOCK] generate_recommendation_agent replaced — deterministic output
-            recommendation = (
-                "Increase DB connection pool size and add a circuit breaker "
-                "around the DB client to prevent cascading timeouts."
-            )
 
             result = {"analysis": analysis, "recommendation": recommendation, "evaluation": evaluation}
         elif task.task_type == "generate_recommendation":
@@ -298,20 +285,22 @@ def analyze_logs(payload: str, task_id: int):
 
 
 def generate_recommendation(payload: str):
+    """
+    Refactored to use the unified AI call that handles both analysis and recommendation.
+    """
     data = json.loads(payload)
-    time.sleep(2)
+    logs = str(data.get("logs", data.get("incident", {}).get("logs", "")))
+    
+    ai_response = analyze_logs_with_ai(logs)
+    
     return {
         "analysis": {
-            "root_cause": "Service connection pool exhausted under sustained load",
-            "severity": "medium",
+            "root_cause": ai_response.get("root_cause", "Unknown"),
+            "severity": ai_response.get("severity", "medium"),
         },
-        "recommendation": (
-            "Scale the DB connection pool from 5 → 20, enable TCP keep-alive, "
-            "and wrap the DB client with a circuit breaker (exponential backoff, "
-            "max 3 retries) to prevent cascading failures under load."
-        ),
+        "recommendation": ai_response.get("recommendation", "No recommendation provided"),
         "evaluation": {
-            "score": 82,
+            "score": 88,
             "confidence": "high",
             "issues": [],
         },
