@@ -81,13 +81,24 @@ def get_all_tasks(
 @app.on_event("startup")
 def startup_event():
     from apps.api.db import models
-    #  CREATE TABLES
+
+    print("🔧 Creating tables...")
+
     Base.metadata.create_all(bind=engine)
-    print(" Table created")
-    #  start worker
+
+    # 🔥 VERIFY TABLES ACTUALLY EXIST
+    print("📦 Tables in metadata:", Base.metadata.tables.keys())
+
+    import time
+    time.sleep(2)   # ⛔ IMPORTANT (temporary stabilization)
+
+    print("✅ Tables should exist now")
+
+    # start worker AFTER delay
     import threading
+
     def start_worker():
-        print(" Worker started")
+        print("🚀 Worker started AFTER DB ready")
         run_worker()
 
     thread = threading.Thread(target=start_worker, daemon=True)
