@@ -80,9 +80,10 @@ def get_all_tasks(
 
 @app.on_event("startup")
 def startup_event():
+    from apps.api.db import models
     #  CREATE TABLES
     Base.metadata.create_all(bind=engine)
-
+    print(" Table created")
     #  start worker
     import threading
     def start_worker():
