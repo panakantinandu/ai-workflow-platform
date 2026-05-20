@@ -6,7 +6,7 @@ import TaskDetail from './components/TaskDetail';
 import StatCard from './components/StatCard';
 import './App.css';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+const API_URL = process.env.REACT_APP_API_URL || 'https://ai-workflow-platform.onrender.com';
 const REFRESH_MS = 5000;
 const LIMIT = 20;
 
