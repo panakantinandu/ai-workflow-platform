@@ -184,10 +184,10 @@ REACT_APP_API_URL=https://ai-workflow-platform.onrender.com
 
 ## 📌 Author
 
-Built by [Your Name]
+Built by Nandu Panakanti
 
 ---
 
-## ⭐ If you like this project
+## Please ⭐ If you like this project :)
 
 Give it a star ⭐ — it helps!
