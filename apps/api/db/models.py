@@ -166,3 +166,26 @@ class Task(Base):
     workflow_run: Mapped["WorkflowRun"] = relationship(
         back_populates="tasks"
     )
+
+# -----------------------------
+# DEAD LETTER QUEUE (DLQ)
+# -----------------------------
+
+class DeadLetterTask(Base):
+    __tablename__ = "dead_letter_tasks"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+
+    original_task_id: Mapped[int] = mapped_column(Integer)
+
+    task_type: Mapped[str] = mapped_column(String(100))
+
+    payload: Mapped[str] = mapped_column(Text)
+
+    error_message: Mapped[str] = mapped_column(Text)
+
+    retry_count: Mapped[int] = mapped_column(Integer, default=0)
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow
+    )
