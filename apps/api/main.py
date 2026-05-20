@@ -9,20 +9,18 @@ os.environ.setdefault("PROMETHEUS_MULTIPROC_DIR", str(_prom_dir.resolve()))
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from fastapi import Depends
+from fastapi import Depends, Request, APIRouter
 from apps.api.db.deps import get_db
 from apps.api.db.models import Task
 from apps.api.routes.incidents import router as incident_router
 from apps.api.routes.workflows import router as workflow_router
 from apps.api.routes.task import router as task_router
 from apps.api.schemas.task import PaginatedTaskResponse
-from fastapi import Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 import logging
 from apps.api.db.base import Base
 from apps.api.db.database import engine
 
-from fastapi.responses import Response
 from prometheus_client import (
     CollectorRegistry,
     generate_latest,
